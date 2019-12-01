@@ -30,7 +30,7 @@ class Client implements FilesystemInterface
      */
     public function __construct($tmpPath = null)
     {
-        $this->tmpPath = $tmpPath ?: getcwd() . DIRECTORY_SEPARATOR . 'WebRover';
+        $this->tmpPath = $tmpPath ?: getcwd() . DIRECTORY_SEPARATOR . 'WebRover' . DIRECTORY_SEPARATOR;
         $this->filesystem = new Filesystem();
     }
 
