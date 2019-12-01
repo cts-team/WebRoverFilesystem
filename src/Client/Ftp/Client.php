@@ -41,7 +41,7 @@ class Client implements FilesystemInterface
      */
     public function __construct($tmpPath = null, array $config = [])
     {
-        $this->tmpPath = $tmpPath ?: getcwd() . DIRECTORY_SEPARATOR . 'WebRover';
+        $this->tmpPath = $tmpPath ?: getcwd() . DIRECTORY_SEPARATOR . 'WebRover'.DIRECTORY_SEPARATOR;
         $client = new FtpClient();
 
         if (!isset($config['ssl'])) $config['ssl'] = false;
