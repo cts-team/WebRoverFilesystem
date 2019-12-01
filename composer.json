@@ -1,0 +1,32 @@
+{
+    "name": "webrover/filesystem",
+    "type": "library",
+    "description": "WebRover Filesystem",
+    "keywords": [
+        "php",
+        "filesystem",
+        "WebRover"
+    ],
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Mr moon",
+            "email": "createsmart@163.com"
+        }
+    ],
+    "require": {
+        "qiniu/php-sdk": "^7.2",
+        "aliyuncs/oss-sdk-php": "^2.3",
+        "qcloud/cos-sdk-v5": "^2.0",
+        "nicolab/php-ftp-client": "^1.5",
+        "symfony/filesystem": "~3.4.30",
+        "symfony/finder": "~3.4.30",
+      "ext-ftp": "*",
+      "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "WebRover\\Filesystem\\": "src/"
+        }
+    }
+}
