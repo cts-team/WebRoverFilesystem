@@ -158,19 +158,19 @@ class Client implements FilesystemInterface
      */
     public function mergeMultipartUpload($path, array $uploadParts = [], $uploadId = null, $bucket = null)
     {
+        if (!$out = @fopen($path, 'wb')) {
+            throw new \InvalidArgumentException('无法打开存储目录');
+        }
+
+        $tmpPath = $this->tmpPath . md5($path);
+
         $finder = new Finder();
 
         $finder->depth(0)
             ->name('/\.part$/')
             ->sortByName()
             ->files()
-            ->in($path);
-
-        if (!$out = @fopen($path, 'wb')) {
-            throw new \InvalidArgumentException('无法打开存储目录');
-        }
-
-        $tmpPath = $this->tmpPath . md5($path);
+            ->in($tmpPath);
 
         foreach ($finder as $fileInfo) {
             $partPath = $fileInfo->getPath();
