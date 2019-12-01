@@ -159,7 +159,7 @@ class Client implements FilesystemInterface
     public function mergeMultipartUpload($path, array $uploadParts = [], $uploadId = null, $bucket = null)
     {
         $this->filesystem->mkdir(dirname($path));
-        
+
         if (!$out = @fopen($path, 'wb')) {
             throw new \InvalidArgumentException('无法打开存储目录');
         }
@@ -175,7 +175,7 @@ class Client implements FilesystemInterface
             ->in($tmpPath);
 
         foreach ($finder as $fileInfo) {
-            $partPath = $fileInfo->getPath();
+            $partPath = $fileInfo->getPathname();
             if (!$in = @fopen($partPath, 'rb')) {
                 break;
             }
