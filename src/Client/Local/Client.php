@@ -150,13 +150,14 @@ class Client implements FilesystemInterface
     /**
      * 组合分片文件
      *
-     * @param $path
+     * @param $identifier
+     * @param array $path
      * @param array $uploadParts
      * @param null $uploadId
      * @param null $bucket
      * @return bool
      */
-    public function mergeMultipartUpload($path, array $uploadParts = [], $uploadId = null, $bucket = null)
+    public function mergeMultipartUpload($identifier, $path, array $uploadParts = [], $uploadId = null, $bucket = null)
     {
         $this->filesystem->mkdir(dirname($path));
 
