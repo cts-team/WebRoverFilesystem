@@ -164,7 +164,7 @@ class Client implements FilesystemInterface
             throw new \InvalidArgumentException('无法打开存储目录');
         }
 
-        $tmpPath = $this->tmpPath . md5($path);
+        $tmpPath = $this->tmpPath . md5($uploadId);
 
         $finder = new Finder();
 
