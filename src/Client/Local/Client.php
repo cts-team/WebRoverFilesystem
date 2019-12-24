@@ -115,20 +115,20 @@ class Client implements FilesystemInterface
     /**
      * 初始化分片上传
      *
-     * @param $identifier
+     * @param $path
      * @param null $bucket
      * @param null $options
      * @return string
      */
-    public function initiateMultipartUpload($identifier, $bucket = null, $options = null)
+    public function initiateMultipartUpload($path, $bucket = null, $options = null)
     {
-        return md5($identifier);
+        return md5($path);
     }
 
     /**
      * 上传单个分片
      *
-     * @param $identifier
+     * @param $path
      * @param $content
      * @param $partNum
      * @param null $uploadId
@@ -136,9 +136,9 @@ class Client implements FilesystemInterface
      * @param array|null $options
      * @return bool
      */
-    public function uploadPart($identifier, $content, $partNum, $uploadId = null, $bucket = null, array $options = null)
+    public function uploadPart($path, $content, $partNum, $uploadId = null, $bucket = null, array $options = null)
     {
-        $tmpPath = $this->tmpPath . md5($identifier);
+        $tmpPath = $this->tmpPath . md5($path);
 
         $partPath = $tmpPath . DIRECTORY_SEPARATOR . "{$partNum}.part";
 
@@ -150,14 +150,13 @@ class Client implements FilesystemInterface
     /**
      * 组合分片文件
      *
-     * @param string $identifier
      * @param string $path
      * @param array $uploadParts
      * @param null $uploadId
      * @param null $bucket
      * @return bool
      */
-    public function mergeMultipartUpload($identifier, $path, array $uploadParts = [], $uploadId = null, $bucket = null)
+    public function mergeMultipartUpload($path, array $uploadParts = [], $uploadId = null, $bucket = null)
     {
         $this->filesystem->mkdir(dirname($path));
 
@@ -165,7 +164,7 @@ class Client implements FilesystemInterface
             throw new \InvalidArgumentException('无法打开存储目录');
         }
 
-        $tmpPath = $this->tmpPath . md5($identifier);
+        $tmpPath = $this->tmpPath . md5($path);
 
         $finder = new Finder();
 
