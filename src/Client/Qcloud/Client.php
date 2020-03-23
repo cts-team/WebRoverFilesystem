@@ -34,8 +34,8 @@ class Client implements FilesystemInterface
     /**
      * 创建文件夹
      *
-     * @param $path
-     * @param null $bucket
+     * @param string $path
+     * @param string $bucket
      */
     public function mkdir($path, $bucket = null)
     {
@@ -45,7 +45,7 @@ class Client implements FilesystemInterface
      * 移除文件或文件夹
      *
      * @param $paths
-     * @param null $bucket
+     * @param string $bucket
      * @param array $options
      * @return void
      */
@@ -88,8 +88,8 @@ class Client implements FilesystemInterface
     /**
      * 移动文件
      *
-     * @param $fromPath
-     * @param $toPath
+     * @param string $fromPath
+     * @param string $toPath
      * @param null $fromBucket
      * @param null $toBucket
      * @param array $options
@@ -97,9 +97,9 @@ class Client implements FilesystemInterface
      */
     public function move($fromPath, $toPath, $fromBucket = null, $toBucket = null, array $options = [])
     {
-        $this->copyFile($fromPath, $toPath, $fromBucket, $toBucket, [
+        $this->copyFile($fromPath, $toPath, $fromBucket, $toBucket, array_merge([
             'MetadataDirective' => 'Replaced'
-        ]);
+        ], $options));
 
         $this->remove($fromPath, $fromBucket);
     }
@@ -107,9 +107,9 @@ class Client implements FilesystemInterface
     /**
      * 重命名文件或文件夹
      *
-     * @param $oldName
-     * @param $newName
-     * @param null $bucket
+     * @param string $oldName
+     * @param string $newName
+     * @param string $bucket
      * @param array|null $options
      * @throws \Exception
      */
@@ -147,7 +147,7 @@ class Client implements FilesystemInterface
     /**
      * 列出所有文件
      *
-     * @param $bucket
+     * @param string $bucket
      * @param string $start
      * @param string $prefix
      * @return array
@@ -187,14 +187,15 @@ class Client implements FilesystemInterface
     /**
      * 上传单个文件
      *
-     * @param $path
-     * @param $content
-     * @param null $bucket
-     * @param null $options
+     * @param string $path
+     * @param string $content
+     * @param string $bucket
+     * @param null|array $options
      * @return mixed
      */
     public function uploadFile($path, $content, $bucket = null, $options = null)
     {
+        if (!is_array($options)) $options = [];
         return $this->client->putObject(array_merge([
             'Bucket' => $bucket, //格式：BucketName-APPID
             'Key' => $path,
@@ -224,13 +225,14 @@ class Client implements FilesystemInterface
     /**
      * 初始化分片上传
      *
-     * @param $path
-     * @param null $bucket
-     * @param null $options
+     * @param string $path
+     * @param string $bucket
+     * @param null|array $options
      * @return mixed
      */
     public function initiateMultipartUpload($path, $bucket = null, $options = null)
     {
+        if (!is_array($options)) $options = [];
         return $this->client->createMultipartUpload(array_merge([
             'Bucket' => $bucket, //格式：BucketName-APPID
             'Key' => $path,
@@ -253,16 +255,17 @@ class Client implements FilesystemInterface
     /**
      * 上传单个分片
      *
-     * @param $path
-     * @param $content
-     * @param $partNum
-     * @param null $uploadId
-     * @param null $bucket
+     * @param string $path
+     * @param string $content
+     * @param int $partNum
+     * @param string $uploadId
+     * @param string $bucket
      * @param array|null $options
      * @return mixed
      */
     public function uploadPart($path, $content, $partNum, $uploadId = null, $bucket = null, array $options = null)
     {
+        if (!is_array($options)) $options = [];
         return $this->client->uploadPart(array_merge([
             'Bucket' => $bucket, //格式：BucketName-APPID
             'Key' => $path,
@@ -279,10 +282,10 @@ class Client implements FilesystemInterface
     /**
      * 组合分片文件
      *
-     * @param $path
+     * @param string $path
      * @param array $uploadParts
-     * @param null $uploadId
-     * @param null $bucket
+     * @param string $uploadId
+     * @param string $bucket
      * @return mixed
      */
     public function mergeMultipartUpload($path, array $uploadParts = [], $uploadId = null, $bucket = null)
@@ -298,14 +301,15 @@ class Client implements FilesystemInterface
     /**
      * 分片上传本地文件
      *
-     * @param $path
-     * @param $file
-     * @param null $bucket
+     * @param string $path
+     * @param string $file
+     * @param string $bucket
      * @param array|null $options
      * @return mixed
      */
     public function multipartUploadFromFile($path, $file, $bucket = null, array $options = null)
     {
+        if (!is_array($options)) $options = [];
         $file = fopen($file, 'rb');
         return $this->client->Upload($bucket, $path, $file, $options);
     }
@@ -313,14 +317,15 @@ class Client implements FilesystemInterface
     /**
      * 下载文件
      *
-     * @param $path
-     * @param null $local
-     * @param null $bucket
+     * @param string $path
+     * @param null|string $local
+     * @param string $bucket
      * @param array|null $options
      * @return mixed
      */
     public function downloadFile($path, $local = null, $bucket = null, array $options = null)
     {
+        if (!is_array($options)) $options = [];
         $config = array_merge([
             'Bucket' => $bucket,
             'Key' => $path,
@@ -345,6 +350,7 @@ class Client implements FilesystemInterface
      */
     public function copyFile($fromPath, $toPath, $fromBucket = null, $toBucket = null, array $options = null)
     {
+        if (!is_array($options)) $options = [];
         $region = $this->config['region'];
 
         $copySource = $fromBucket . '.cos.' . $region . '.myqcloud.com/' . $fromPath;
@@ -359,30 +365,32 @@ class Client implements FilesystemInterface
     /**
      * 判断文件是否存在
      *
-     * @param $path
-     * @param null $bucket
-     * @param null $options
+     * @param string $path
+     * @param string $bucket
+     * @param null|array $options
      * @return bool
      */
     public function fileExist($path, $bucket = null, $options = null)
     {
-        return $this->client->doesObjectExist($bucket, $path);
+        if (!is_array($options)) $options = [];
+        return $this->client->doesObjectExist($bucket, $path, $options);
     }
 
     /**
      * 获取文件元信息
      *
-     * @param $path
-     * @param null $bucket
-     * @param null $options
+     * @param string $path
+     * @param string $bucket
+     * @param null|array $options
      * @return mixed
      */
     public function getFileMeta($path, $bucket = null, $options = null)
     {
-        return $this->client->headObject(array(
+        if (!is_array($options)) $options = [];
+        return $this->client->headObject(array_merge(array(
             'Bucket' => $bucket, //格式：BucketName-APPID
             'Key' => $path,
-        ));
+        ), $options));
     }
 
     /**
@@ -391,7 +399,7 @@ class Client implements FilesystemInterface
      * @param string $prefix
      * @param string $start
      * @param int $size
-     * @param null $bucket
+     * @param string $bucket
      * @return mixed
      */
     public function listFile($prefix = '', $start = '', $size = 100, $bucket = null)
