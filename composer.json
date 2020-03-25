@@ -19,8 +19,8 @@
         "aliyuncs/oss-sdk-php": "^2.3",
         "qcloud/cos-sdk-v5": "^2.0",
         "nicolab/php-ftp-client": "^1.5",
-        "symfony/filesystem": "^3.4.30",
-        "symfony/finder": "^3.4.30",
+        "symfony/filesystem": "~3.4.30",
+        "symfony/finder": "~3.4.30",
       "ext-ftp": "*",
       "ext-json": "*"
     },
