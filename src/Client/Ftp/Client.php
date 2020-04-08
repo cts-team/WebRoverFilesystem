@@ -41,31 +41,25 @@ class Client implements FilesystemInterface
      */
     public function __construct($tmpPath = null, array $config = [])
     {
-        $this->tmpPath = $tmpPath ?: getcwd() . DIRECTORY_SEPARATOR . 'WebRover'.DIRECTORY_SEPARATOR;
+        $this->tmpPath = $tmpPath ?: getcwd() . DIRECTORY_SEPARATOR . 'WebRover' . DIRECTORY_SEPARATOR;
         $client = new FtpClient();
-
         if (!isset($config['ssl'])) $config['ssl'] = false;
         if (!isset($config['port'])) $config['port'] = 21;
         if (!isset($config['timeout'])) $config['timeout'] = 90;
         if (!isset($config['username'])) $config['username'] = 'anonymous';
         if (!isset($config['password'])) $config['password'] = '';
-
         $this->config = $config;
-
         $client->connect(
             $config['host'],
             $config['ssl'],
             $config['port'],
             $config['timeout']
         );
-
         $client->login(
             $config['username'],
             $config['password']
         );
-
         $this->client = $client;
-
         $this->filesystem = new Filesystem();
     }
 
@@ -96,19 +90,16 @@ class Client implements FilesystemInterface
         } elseif (!\is_array($paths)) {
             $paths = [$paths];
         }
-
         foreach ($paths as $path) {
             if ($this->client->size($path) > -1) {
                 $this->client->remove($path);
                 continue;
             }
-
             try {
                 $files = $this->client->scanDir($path);
             } catch (\Exception$exception) {
                 continue;
             }
-
             foreach ($files as $key => $file) {
                 list($type, $truePath) = explode('#', $key);
                 if ($type == 'file') {
@@ -119,7 +110,6 @@ class Client implements FilesystemInterface
                     $this->remove(explode('#', $key, 2)[1]);
                 }
             }
-
             if ($this->client->isEmpty($path)) $this->client->rmdir($path, true);
         }
     }
@@ -170,13 +160,10 @@ class Client implements FilesystemInterface
         if (!is_dir($info['dirname'])) {
             $this->client->mkdir($info['dirname'], true);
         }
-
         if (file_exists($content)) {
             return $this->client->put($path, $content, FTP_BINARY);
         }
-
         $this->client->putFromString($path, $content);
-
         return true;
     }
 
@@ -207,10 +194,8 @@ class Client implements FilesystemInterface
      */
     public function uploadPart($path, $content, $partNum, $uploadId = null, $bucket = null, array $options = null)
     {
-        $tmpPath = $this->tmpPath . md5($path);
-
+        $tmpPath = $this->tmpPath . DIRECTORY_SEPARATOR . $uploadId;
         $partPath = $tmpPath . DIRECTORY_SEPARATOR . "{$partNum}.part";
-
         return $this->uploadFile($partPath, $content);
     }
 
@@ -225,16 +210,12 @@ class Client implements FilesystemInterface
      */
     public function mergeMultipartUpload($path, array $uploadParts = [], $uploadId = null, $bucket = null)
     {
-        $tmpPath = $this->tmpPath . md5($path);
-
+        $tmpPath = $this->tmpPath . DIRECTORY_SEPARATOR . $uploadId;
         $parts = $this->client->scanDir($tmpPath);
-
         $uri = 'ftp://' . $this->config['username'] . ':' . $this->config['password'] . '@' . $this->config['host'] . '/';
-
         if (!$out = @fopen($uri . $path, 'wb')) {
             throw new \InvalidArgumentException('无法打开存储目录');
         }
-
         foreach ($parts as $part) {
             $partPath = $uri . $tmpPath . DIRECTORY_SEPARATOR . $part['name'];
             if (!$in = @fopen($partPath, 'rb')) {
@@ -246,11 +227,8 @@ class Client implements FilesystemInterface
             @fclose($in);
             $this->client->remove($partPath);
         }
-
         @fclose($out);
-
         $this->client->remove($tmpPath, true);
-
         return true;
     }
 
@@ -283,7 +261,6 @@ class Client implements FilesystemInterface
         if (!is_null($local)) {
             return $this->client->getContent($path);
         }
-
         return $this->client->get($local, $path, FTP_BINARY);
     }
 
@@ -305,7 +282,6 @@ class Client implements FilesystemInterface
             $this->remove($fromPath);
             $this->uploadFile($toPath, $content);
         }
-
         return true;
     }
 
@@ -333,7 +309,6 @@ class Client implements FilesystemInterface
     public function getFileMeta($path, $bucket = null, $options = null)
     {
         $content = $this->client->getContent($path);
-
         return stream_for($content);
     }
 
