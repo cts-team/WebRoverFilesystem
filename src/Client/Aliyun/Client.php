@@ -226,6 +226,7 @@ class Client implements FilesystemInterface
     public function uploadPart($path, $content, $partNum, $uploadId = null, $bucket = null, array $options = null)
     {
         $ossClient = $this->ossClient;
+        $options = is_array($options) ? $options : [];
         $options = array_merge([
             $ossClient::OSS_CONTENT => $content,
             $ossClient::OSS_PART_NUM => $partNum,
