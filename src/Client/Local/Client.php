@@ -102,13 +102,10 @@ class Client implements FilesystemInterface
         if (!is_dir($info['dirname'])) {
             $this->filesystem->mkdir($info['dirname']);
         }
-
         if (file_exists($content)) {
             return $this->copyFile($content, $path);
         }
-
         $this->filesystem->dumpFile($path, $content);
-
         return true;
     }
 
@@ -138,12 +135,9 @@ class Client implements FilesystemInterface
      */
     public function uploadPart($path, $content, $partNum, $uploadId = null, $bucket = null, array $options = null)
     {
-        $tmpPath = $this->tmpPath . md5($path);
-
+        $tmpPath = $this->tmpPath . DIRECTORY_SEPARATOR . $uploadId;
         $partPath = $tmpPath . DIRECTORY_SEPARATOR . "{$partNum}.part";
-
         $this->filesystem->dumpFile($partPath, $content);
-
         return true;
     }
 
@@ -159,20 +153,15 @@ class Client implements FilesystemInterface
     public function mergeMultipartUpload($path, array $uploadParts = [], $uploadId = null, $bucket = null)
     {
         $this->filesystem->mkdir(dirname($path));
-
         if (!$out = @fopen($path, 'wb')) {
             throw new \InvalidArgumentException('无法打开存储目录');
         }
-
-        $tmpPath = $this->tmpPath . md5($uploadId);
-
+        $tmpPath = $this->tmpPath . DIRECTORY_SEPARATOR . $uploadId;
         $finder = new Finder();
-
         $finder->depth(0)
             ->name('/\.part$/')
             ->files()
             ->in($tmpPath);
-
         for ($i = 1; $i <= $finder->count(); $i++) {
             $partPath = $tmpPath . DIRECTORY_SEPARATOR . $i . '.part';
             if (!$in = @fopen($partPath, 'rb')) {
@@ -184,11 +173,8 @@ class Client implements FilesystemInterface
             @fclose($in);
             @unlink($partPath);
         }
-
         @fclose($out);
-
         $this->filesystem->remove($tmpPath);
-
         return true;
     }
 
@@ -220,7 +206,6 @@ class Client implements FilesystemInterface
         if (!is_null($local)) {
             return $this->copyFile($path, $local);
         }
-
         return file_get_contents($path);
     }
 
@@ -239,7 +224,6 @@ class Client implements FilesystemInterface
         if ($fromPath != $toPath) {
             $this->filesystem->copy($fromPath, $toPath, true);
         }
-
         return true;
     }
 
@@ -281,7 +265,6 @@ class Client implements FilesystemInterface
     public function listFile($prefix = '', $start = '', $size = 100, $bucket = null)
     {
         $finder = new Finder();
-
         return $finder->depth(0)->files()->in($prefix);
     }
 }
